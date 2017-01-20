@@ -138,9 +138,9 @@ class CovPlugin(object):
         self._disabled = False
         self.options = options
 
-        is_dist = (getattr(options, 'numprocesses', False) or
-                   getattr(options, 'distload', False) or
-                   getattr(options, 'dist', 'no') != 'no')
+        self.is_dist = (getattr(options, 'numprocesses', False) or
+                        getattr(options, 'distload', False) or
+                        getattr(options, 'dist', 'no') != 'no')
         if getattr(options, 'no_cov', False):
             self._disabled = True
             return
@@ -213,7 +213,7 @@ class CovPlugin(object):
                 self.start(engine.DistSlave, session.config, nodeid)
             elif not self._started:
                 self.start(engine.Central)
-    
+
         yield
 
         if self._disabled:
