@@ -145,15 +145,7 @@ class CovPlugin(object):
             self._disabled = True
             return
 
-        if is_dist and start:
-            self.start(engine.DistMaster)
-        elif start:
-            self.start(engine.Central)
-
-        # slave is started in pytest hook
-
     def start(self, controller_cls, config=None, nodeid=None):
-
         if config is None:
             # fake config option for engine
             class Config(object):
@@ -186,14 +178,6 @@ class CovPlugin(object):
             self._disabled = True
             return
 
-        self.pid = os.getpid()
-        if self._is_slave(session):
-            nodeid = session.config.slaveinput.get('slaveid',
-                                                   getattr(session, 'nodeid'))
-            self.start(engine.DistSlave, session.config, nodeid)
-        elif not self._started:
-            self.start(engine.Central)
-
     def pytest_configure_node(self, node):
         """Delegate to our implementation.
 
@@ -221,6 +205,15 @@ class CovPlugin(object):
     # runs, it's too late to set testsfailed
     @compat.hookwrapper
     def pytest_runtestloop(self, session):
+        if not self._disabled:
+            self.pid = os.getpid()
+            if self._is_slave(session):
+                nodeid = session.config.slaveinput.get('slaveid',
+                                                       getattr(session, 'nodeid'))
+                self.start(engine.DistSlave, session.config, nodeid)
+            elif not self._started:
+                self.start(engine.Central)
+    
         yield
 
         if self._disabled:
