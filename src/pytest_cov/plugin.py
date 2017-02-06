@@ -247,16 +247,18 @@ class CovPlugin(object):
     @compat.hookwrapper
     def pytest_collection_finish(self, session):
         paused = False
-        if self._started:
+        if self._started and isinstance(self.cov_controller, engine.Central):
             paused = True
-            # self.cov_controller.cov.stop()
-            # self.cov_controller.cov.combine()
-            # self.cov_controller.cov.save()
+            self.cov_controller.cov.unset_env()
+            self.cov_controller.cov.stop()
+            self.cov_controller.cov.combine()
+            self.cov_controller.cov.save()
         yield
         if paused:
             pass
-            # self.cov_controller.cov.load()
-            # self.cov_controller.start()
+            self.cov_controller.cov.load()
+            self.cov_controller.start()
+            self.cov_controller.cov.set_env()
 
     def pytest_terminal_summary(self, terminalreporter):
         if self._disabled:
