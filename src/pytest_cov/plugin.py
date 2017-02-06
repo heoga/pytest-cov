@@ -249,13 +249,13 @@ class CovPlugin(object):
         paused = False
         if self._started:
             paused = True
-            self.cov_controller.cov.stop()
-            self.cov_controller.cov.combine()
-            self.cov_controller.cov.save()
+            # self.cov_controller.cov.stop()
+            # self.cov_controller.cov.combine()
+            # self.cov_controller.cov.save()
         yield
         if paused:
-            self.cov_controller.cov.load()
-            self.cov_controller.start()
+            # self.cov_controller.cov.load()
+            # self.cov_controller.start()
 
     def pytest_terminal_summary(self, terminalreporter):
         if self._disabled:
