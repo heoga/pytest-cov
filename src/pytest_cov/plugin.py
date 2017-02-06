@@ -233,6 +233,14 @@ class CovPlugin(object):
     # runs, it's too late to set testsfailed
     @compat.hookwrapper
     def pytest_runtestloop(self, session):
+        if self._delayed_start:
+            if self._is_slave(session):
+                nodeid = session.config.slaveinput.get('slaveid',
+                                                       getattr(session, 'nodeid'))
+                self.start(engine.DistSlave, session.config, nodeid)
+            elif not self._started:
+                self.start(engine.Central)
+
         yield
 
         if self._disabled:
