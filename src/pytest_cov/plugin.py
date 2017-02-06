@@ -244,6 +244,19 @@ class CovPlugin(object):
                 # make sure we get the EXIT_TESTSFAILED exit code
                 compat_session.testsfailed += 1
 
+    @compat.hookwrapper
+    def pytest_collection_finish(self, session):
+        paused = False
+        if self._started:
+            paused = True
+            self.cov_controller.cov.stop()
+            self.cov_controller.cov.combine()
+            self.cov_controller.cov.save()
+        yield
+        if paused:
+            self.cov_controller.cov.load()
+            self.cov_controller.start()
+
     def pytest_terminal_summary(self, terminalreporter):
         if self._disabled:
             msg = 'Coverage disabled via --no-cov switch!'
