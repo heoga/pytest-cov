@@ -1,5 +1,6 @@
 """Coverage plugin for pytest."""
 import os
+import sys
 
 import pytest
 import argparse
@@ -249,16 +250,11 @@ class CovPlugin(object):
         paused = False
         if self._started and isinstance(self.cov_controller, engine.Central):
             paused = True
-            self.cov_controller.unset_env()
-            self.cov_controller.cov.stop()
-            self.cov_controller.cov.combine()
-            self.cov_controller.cov.save()
+            tracer = sys.gettrace()
+            sys.settrace(None)
         yield
         if paused:
-            pass
-            self.cov_controller.cov.load()
-            self.cov_controller.start()
-            self.cov_controller.set_env()
+            sys.settrace(tracer)
 
     def pytest_terminal_summary(self, terminalreporter):
         if self._disabled:
