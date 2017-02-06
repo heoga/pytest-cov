@@ -254,6 +254,7 @@ class CovPlugin(object):
             # self.cov_controller.cov.save()
         yield
         if paused:
+            pass
             # self.cov_controller.cov.load()
             # self.cov_controller.start()
 
