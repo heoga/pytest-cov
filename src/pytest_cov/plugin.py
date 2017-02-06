@@ -195,6 +195,10 @@ class CovPlugin(object):
             return
 
         self.pid = os.getpid()
+
+        if self._delayed_start:
+            return
+
         if self._is_slave(session):
             nodeid = session.config.slaveinput.get('slaveid',
                                                    getattr(session, 'nodeid'))
