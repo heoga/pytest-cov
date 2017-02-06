@@ -77,6 +77,9 @@ def pytest_addoption(parser):
     group.addoption('--cov-append', action='store_true', default=False,
                     help='do not delete coverage but append to current, '
                          'default: False')
+    group.addoption('--delay-cov', action='store_true', default=False,
+                    help='Delays start of coverage until just before tests start.'
+                         'default: False')
 
 
 @pytest.mark.tryfirst
@@ -136,6 +139,7 @@ class CovPlugin(object):
         self.failed = False
         self._started = False
         self._disabled = False
+        self._delayed_start = False
         self.options = options
 
         is_dist = (getattr(options, 'numprocesses', False) or
@@ -143,6 +147,10 @@ class CovPlugin(object):
                    getattr(options, 'dist', 'no') != 'no')
         if getattr(options, 'no_cov', False):
             self._disabled = True
+            return
+
+        if getattr(options, 'delay_cov', False):
+            self._delayed_start = True
             return
 
         if is_dist and start:
